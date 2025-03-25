@@ -54,10 +54,17 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
 
     // Koin
-    implementation("io.insert-koin:koin-core:4.0.2")
-    implementation("io.insert-koin:koin-android:4.0.2")
-    implementation("io.insert-koin:koin-androidx-compose:4.0.2")
-    implementation("io.insert-koin:koin-androidx-compose-navigation:4.0.2")
+    implementation(platform("io.insert-koin:koin-bom:4.0.2"))
+    implementation("io.insert-koin:koin-core")
+    implementation("io.insert-koin:koin-android")
+    implementation("io.insert-koin:koin-androidx-compose")
+    implementation("io.insert-koin:koin-core-coroutines")
+    implementation("io.insert-koin:koin-compose-viewmodel")
+    implementation("io.insert-koin:koin-androidx-compose-navigation")
+    implementation("io.insert-koin:koin-androidx-workmanager")
+    implementation("io.insert-koin:koin-annotations:2.0.0")
+    ksp("io.insert-koin:koin-ksp-compiler:2.0.0")
+
 
     // Compose Navigation
     implementation("androidx.navigation:navigation-compose:2.8.9")
