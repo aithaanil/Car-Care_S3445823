@@ -1,4 +1,4 @@
-package uk.ac.tees.mad.carcare.ui.screens.login
+package uk.ac.tees.mad.carcare.ui.screens.signup
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +18,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.HowToReg
@@ -56,99 +59,25 @@ import org.koin.androidx.compose.koinViewModel
 import uk.ac.tees.mad.carcare.R
 import uk.ac.tees.mad.carcare.model.dataclass.firebase.AuthResult
 import uk.ac.tees.mad.carcare.ui.navigation.Dest
-import uk.ac.tees.mad.carcare.ui.navigation.SubGraph
+import uk.ac.tees.mad.carcare.ui.screens.login.LogInScreenViewModel
 
 @Composable
-fun LogInScreen(
+fun SignUpScreen(
     modifier: Modifier = Modifier,
-    navigate: (Any) -> Unit,
-    openAndPopUp: (Any, Any) -> Unit,
-    viewmodel: LogInScreenViewModel = koinViewModel<LogInScreenViewModel>()
+    popUp: () -> Unit,
+    viewmodel: SignUpScreenViewModel = koinViewModel<SignUpScreenViewModel>()
 ) {
-
+    val name by viewmodel.name.collectAsStateWithLifecycle()
     val email by viewmodel.email.collectAsStateWithLifecycle()
     val password by viewmodel.password.collectAsStateWithLifecycle()
     val isPasswordVisible by viewmodel.isPasswordVisible.collectAsStateWithLifecycle()
-    val isLogInMode by viewmodel.isLogInMode.collectAsStateWithLifecycle()
-    val logInResult by viewmodel.logInResult.collectAsStateWithLifecycle()
+    val isSignUpMode by viewmodel.isSignUpMode.collectAsStateWithLifecycle()
+    val signUpResult by viewmodel.signUpResult.collectAsStateWithLifecycle()
 
     val focusManager = LocalFocusManager.current
+    val focusRequesterName = remember { FocusRequester() }
     val focusRequesterEmail = remember { FocusRequester() }
     val focusRequesterPassword = remember { FocusRequester() }
-
-    if (!isLogInMode) {
-        when (val result = logInResult) {
-            is AuthResult.Loading -> {
-                AlertDialog(onDismissRequest = {
-                    viewmodel.switchSignInMode()
-                }, icon = {
-                    Icon(
-                        Icons.AutoMirrored.Filled.Login,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }, title = {
-                    Text(
-                        text = "Logging In",
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }, text = {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }, confirmButton = { })
-            }
-
-            is AuthResult.Success -> {
-                // Handle successful log in
-                openAndPopUp(SubGraph.HomeGraph, SubGraph.AuthGraph)
-
-            }
-
-            is AuthResult.Error -> {
-                // Handle sign-up error
-                AlertDialog(icon = {
-                    Icon(
-                        Icons.Default.Error,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }, title = {
-                    Text(
-                        text = "Error",
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }, text = {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = result.exception.message.toString(),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }, confirmButton = {
-                    TextButton(onClick = {
-                        viewmodel.switchSignInMode()
-                    }) {
-                        Text(text = "Retry?", fontWeight = FontWeight.Bold)
-                    }
-                }, onDismissRequest = {
-                    viewmodel.switchSignInMode()
-                })
-            }
-        }
-    }
 
     Column(
         modifier = modifier
@@ -159,6 +88,111 @@ fun LogInScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        if (!isSignUpMode) {
+            when (val result = signUpResult) {
+                is AuthResult.Loading -> {
+                    AlertDialog(onDismissRequest = {
+                        viewmodel.switchSignUpMode()
+                    }, icon = {
+                        Icon(
+                            Icons.Default.CloudUpload,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }, title = {
+                        Text(
+                            text = "Signing Up",
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }, text = {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            )
+                        }
+                    }, confirmButton = { })
+                }
+
+                is AuthResult.Success -> {
+                    // Handle successful sign-up
+                    AlertDialog(icon = {
+                        Icon(
+                            Icons.Default.CloudDone,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }, title = {
+                        Text(
+                            text = "Sign Up Successful",
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }, text = {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "You have successfully signed up.",
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }, confirmButton = {
+                        TextButton(onClick = {
+                            popUp()
+                        }) {
+                            Text(
+                                text = "Go to Log In Screen", fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }, onDismissRequest = {
+                        popUp()
+                    })
+
+                }
+
+                is AuthResult.Error -> {
+                    // Handle sign-up error
+                    AlertDialog(icon = {
+                        Icon(
+                            Icons.Default.Error,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }, title = {
+                        Text(
+                            text = "Error",
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }, text = {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(result.exception.message.toString())
+                        }
+                    }, confirmButton = {
+                        TextButton(onClick = {
+                            viewmodel.switchSignUpMode()
+                        }) {
+                            Text(text = "Retry?", fontWeight = FontWeight.Bold)
+                        }
+                    }, onDismissRequest = {
+                        viewmodel.switchSignUpMode()
+                    })
+                }
+            }
+        }
+
         // App Logo and Name
         Image(
             painter = painterResource(id = R.drawable.carcareapp_logo),
@@ -177,13 +211,46 @@ fun LogInScreen(
         Spacer(modifier = modifier.height(24.dp))
 
         Text(
-            text = "Log In",
+            text = "Sign Up",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onBackground
         )
 
         Spacer(modifier = modifier.height(24.dp))
+
+        // UserName TextField
+        OutlinedTextField(
+            value = name,
+            modifier = modifier
+                .fillMaxWidth(0.9f)
+                .focusRequester(focusRequesterName),
+            onValueChange = {
+                viewmodel.updateName(it)
+            },
+            label = {
+                Text(
+                    text = "Name"
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    Icons.Filled.AccountCircle,
+                    contentDescription = "Name",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(onNext = {
+                focusRequesterEmail.requestFocus()
+            }),
+            shape = MaterialTheme.shapes.extraLarge,
+            singleLine = true
+        )
+
+        Spacer(modifier = modifier.height(16.dp))
 
         // Email TextField
         OutlinedTextField(
@@ -263,24 +330,24 @@ fun LogInScreen(
 
         Spacer(modifier = modifier.height(24.dp))
 
-        // Login Button
+        // SignUp Button
         Button(
-            enabled = email.isNotBlank() && password.isNotBlank(),
+            enabled = name.isNotBlank() && email.isNotBlank() && password.isNotBlank(),
             onClick = {
-                viewmodel.logIn(email, password)
-                viewmodel.switchSignInMode()
+                viewmodel.signUp(email, password)
+                viewmodel.switchSignUpMode()
             },
             modifier = modifier.fillMaxWidth(0.8f),
             shape = MaterialTheme.shapes.extraLarge
         ) {
             Icon(
-                Icons.AutoMirrored.Filled.Login,
+                Icons.Default.HowToReg,
                 contentDescription = null,
                 modifier = modifier.size(24.dp),
             )
             Spacer(modifier = modifier.width(4.dp))
             Text(
-                "Log In", style = MaterialTheme.typography.titleMedium
+                "Sign Up", style = MaterialTheme.typography.titleMedium
             )
         }
 
@@ -292,25 +359,26 @@ fun LogInScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Don't have an account?",
+                text = "Already have an account?",
                 textAlign = TextAlign.Center
             )
             TextButton(
                 onClick = {
-                    navigate(Dest.SignUPScreen)
-            }) {
+                    popUp()
+                }) {
                 Icon(
-                    Icons.Default.HowToReg,
+                    Icons.AutoMirrored.Filled.Login,
                     contentDescription = null,
                     modifier = modifier.size(24.dp),
                 )
                 Spacer(modifier = modifier.width(4.dp))
                 Text(
-                    text = "Sign Up",
+                    text = "Log In",
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
             }
         }
     }
+
 }

@@ -1,0 +1,63 @@
+package uk.ac.tees.mad.carcare.ui.screens.signup
+
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import uk.ac.tees.mad.carcare.model.dataclass.firebase.AuthResult
+import uk.ac.tees.mad.carcare.model.repository.AuthRepository
+import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
+
+class SignUpScreenViewModel(
+    private val authRepository: AuthRepository
+): CarCareAppViewModel() {
+
+    private val _signUpResult = MutableStateFlow<AuthResult<Boolean>>(AuthResult.Success(false))
+    val signUpResult: StateFlow<AuthResult<Boolean>> = _signUpResult.asStateFlow()
+
+    private val _name = MutableStateFlow("")
+    val name = _name.asStateFlow()
+
+    private val _email = MutableStateFlow("")
+    val email = _email.asStateFlow()
+
+    private val _password = MutableStateFlow("")
+    val password = _password.asStateFlow()
+
+    private val _isPasswordVisible = MutableStateFlow(false)
+    val isPasswordVisible = _isPasswordVisible.asStateFlow()
+
+    private val _isSignUpMode = MutableStateFlow(true)
+    val isSignUpMode = _isSignUpMode.asStateFlow()
+
+    fun updateName(newName: String) {
+        _name.value = newName
+    }
+
+    fun updateEmail(newEmail: String) {
+        _email.value = newEmail
+    }
+
+    fun updatePassword(newPassword: String) {
+        _password.value = newPassword
+    }
+
+    fun togglePasswordVisibility() {
+        _isPasswordVisible.value = !_isPasswordVisible.value
+    }
+
+    fun switchSignUpMode() {
+        _isSignUpMode.value = !_isSignUpMode.value
+    }
+
+    fun signUp(email: String, pass: String) {
+        authRepository.signUp(email, pass).onEach { result ->
+            _signUpResult.value = result
+            if (result is AuthResult.Success) {
+                authRepository.updateDisplayName(_name.value)
+            }
+        }.launchIn(viewModelScope)
+    }
+}

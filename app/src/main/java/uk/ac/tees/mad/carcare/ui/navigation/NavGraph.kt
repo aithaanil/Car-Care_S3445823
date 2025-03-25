@@ -19,4 +19,10 @@ sealed class Dest {
 
     @Serializable
     data object LogInScreen : Dest()
+
+    @Serializable
+    data object SignUPScreen : Dest()
+
+    @Serializable
+    data object HomeScreen : Dest()
 }
