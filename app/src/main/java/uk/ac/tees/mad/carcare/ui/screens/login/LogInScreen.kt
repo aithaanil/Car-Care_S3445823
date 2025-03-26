@@ -1,5 +1,10 @@
 package uk.ac.tees.mad.carcare.ui.screens.login
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,13 +39,18 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -52,6 +62,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import uk.ac.tees.mad.carcare.R
 import uk.ac.tees.mad.carcare.model.dataclass.firebase.AuthResult
@@ -66,15 +77,88 @@ fun LogInScreen(
     viewmodel: LogInScreenViewModel = koinViewModel<LogInScreenViewModel>()
 ) {
 
+    val context = LocalContext.current
+
     val email by viewmodel.email.collectAsStateWithLifecycle()
     val password by viewmodel.password.collectAsStateWithLifecycle()
     val isPasswordVisible by viewmodel.isPasswordVisible.collectAsStateWithLifecycle()
     val isLogInMode by viewmodel.isLogInMode.collectAsStateWithLifecycle()
     val logInResult by viewmodel.logInResult.collectAsStateWithLifecycle()
+    val signInState by viewmodel.signInState.collectAsStateWithLifecycle()
+
+    var showSignInErrorDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     val focusManager = LocalFocusManager.current
     val focusRequesterEmail = remember { FocusRequester() }
     val focusRequesterPassword = remember { FocusRequester() }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                viewmodel.signInWithIntent(
+                    intent = result.data ?: return@rememberLauncherForActivityResult
+                )
+            }
+        }
+    )
+
+    LaunchedEffect(key1 = signInState.isSignInSuccessful) {
+        if (signInState.isSignInSuccessful) {
+            openAndPopUp(SubGraph.HomeGraph, SubGraph.AuthGraph)
+            viewmodel.resetState()
+        }
+        if (signInState.signInError != null) {
+            // Update the dialog state
+            showSignInErrorDialog = true
+        }
+    }
+
+    if (showSignInErrorDialog) {
+        AlertDialog(
+            icon = {
+                Icon(
+                    Icons.Default.Error,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = {
+                Text(
+                    text = "Error",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = signInState.signInError!!,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewmodel.resetState()
+                    showSignInErrorDialog = false // Hide dialog after click on button
+                }) {
+                    Text(text = "Retry?", fontWeight = FontWeight.Bold)
+                }
+            },
+            onDismissRequest = {
+                viewmodel.resetState()
+                showSignInErrorDialog = false // Hide dialog when dismissed
+            }
+        )
+    }
+
 
     if (!isLogInMode) {
         when (val result = logInResult) {
@@ -281,6 +365,38 @@ fun LogInScreen(
             Spacer(modifier = modifier.width(4.dp))
             Text(
                 "Log In", style = MaterialTheme.typography.titleMedium
+            )
+        }
+        Spacer(modifier = modifier.height(24.dp))
+
+        Text("OR")
+
+        Spacer(modifier = modifier.height(16.dp))
+
+        // Google Sign In Button
+        Button(
+            onClick = {
+                coroutineScope.launch { // Launch a coroutine
+                    val intentSender = viewmodel.logInWithGoogle()
+                    if (intentSender != null) {
+                        launcher.launch(IntentSenderRequest.Builder(intentSender).build())
+                    } else {
+                        Log.e("LogInScreen", "intent sender is null")
+                        // Handle the case where intentSender is null (e.g., display an error message)
+                    }
+                }
+            },
+            modifier = modifier.fillMaxWidth(0.8f),
+            shape = MaterialTheme.shapes.extraLarge
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.google_logo),
+                contentDescription = "Google Sign In",
+                modifier = modifier.size(24.dp)
+            )
+            Spacer(modifier = modifier.width(4.dp))
+            Text(
+                "Sign In with Google", style = MaterialTheme.typography.titleMedium
             )
         }
 

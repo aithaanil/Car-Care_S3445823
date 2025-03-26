@@ -1,17 +1,25 @@
 package uk.ac.tees.mad.carcare.ui.screens.login
 
+import android.content.Intent
+import android.content.IntentSender
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import uk.ac.tees.mad.carcare.model.dataclass.firebase.AuthResult
+import uk.ac.tees.mad.carcare.model.dataclass.firebase.SignInResult
+import uk.ac.tees.mad.carcare.model.dataclass.firebase.SignInState
 import uk.ac.tees.mad.carcare.model.repository.AuthRepository
+import uk.ac.tees.mad.carcare.model.utils.GoogleAuthUiClient
 import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 
 class LogInScreenViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val googleAuthUiClient: GoogleAuthUiClient
 ): CarCareAppViewModel() {
     private val _logInResult = MutableStateFlow<AuthResult<Boolean>>(AuthResult.Success(false))
     val logInResult: StateFlow<AuthResult<Boolean>> = _logInResult.asStateFlow()
@@ -27,6 +35,9 @@ class LogInScreenViewModel(
 
     private val _isLogInMode = MutableStateFlow(true)
     val isLogInMode = _isLogInMode.asStateFlow()
+
+    private val _signInState = MutableStateFlow(SignInState())
+    val signInState = _signInState.asStateFlow()
 
     fun updateEmail(newEmail: String) {
         _email.value = newEmail
@@ -48,5 +59,37 @@ class LogInScreenViewModel(
         authRepository.signIn(email, pass).onEach { result ->
             _logInResult.value = result
         }.launchIn(viewModelScope)
+    }
+
+    // New functions for Google Sign-In
+    fun resetState() {
+        _signInState.value = SignInState()
+    }
+
+    fun onSignInResult(result: SignInResult) {
+        _signInState.value = _signInState.value.copy(
+            isSignInSuccessful = result.data != null,
+            signInError = result.errorMessage
+        )
+        if (result.data != null) {
+            _logInResult.value = AuthResult.Success(true)
+        }
+    }
+
+    suspend fun logInWithGoogle(): IntentSender? {
+        return try {
+            googleAuthUiClient.signIn()
+        } catch (e: Exception) {
+            Log.e("LogInScreenViewModel", "Error during Google Sign-In", e)
+            // Handle the exception appropriately, e.g., show an error to the user
+            null
+        }
+    }
+
+    fun signInWithIntent(intent: Intent) {
+        viewModelScope.launch {
+            val signInResult = googleAuthUiClient.signInWithIntent(intent)
+            onSignInResult(signInResult)
+        }
     }
 }
