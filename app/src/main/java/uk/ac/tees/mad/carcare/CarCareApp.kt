@@ -17,7 +17,7 @@ import uk.ac.tees.mad.carcare.ui.theme.CarCareTheme
 
 @Composable
 fun CarCareApp() {
-    CarCareTheme{
+    CarCareTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             val appState = rememberAppState()
 

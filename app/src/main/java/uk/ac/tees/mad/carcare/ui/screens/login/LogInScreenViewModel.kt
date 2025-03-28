@@ -18,9 +18,8 @@ import uk.ac.tees.mad.carcare.model.utils.GoogleAuthUiClient
 import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 
 class LogInScreenViewModel(
-    private val authRepository: AuthRepository,
-    private val googleAuthUiClient: GoogleAuthUiClient
-): CarCareAppViewModel() {
+    private val authRepository: AuthRepository, private val googleAuthUiClient: GoogleAuthUiClient
+) : CarCareAppViewModel() {
     private val _logInResult = MutableStateFlow<AuthResult<Boolean>>(AuthResult.Success(false))
     val logInResult: StateFlow<AuthResult<Boolean>> = _logInResult.asStateFlow()
 
@@ -68,8 +67,7 @@ class LogInScreenViewModel(
 
     fun onSignInResult(result: SignInResult) {
         _signInState.value = _signInState.value.copy(
-            isSignInSuccessful = result.data != null,
-            signInError = result.errorMessage
+            isSignInSuccessful = result.data != null, signInError = result.errorMessage
         )
         if (result.data != null) {
             _logInResult.value = AuthResult.Success(true)

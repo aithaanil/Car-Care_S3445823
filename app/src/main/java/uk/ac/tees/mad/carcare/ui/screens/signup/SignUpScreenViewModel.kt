@@ -12,7 +12,7 @@ import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 
 class SignUpScreenViewModel(
     private val authRepository: AuthRepository
-): CarCareAppViewModel() {
+) : CarCareAppViewModel() {
 
     private val _signUpResult = MutableStateFlow<AuthResult<Boolean>>(AuthResult.Success(false))
     val signUpResult: StateFlow<AuthResult<Boolean>> = _signUpResult.asStateFlow()

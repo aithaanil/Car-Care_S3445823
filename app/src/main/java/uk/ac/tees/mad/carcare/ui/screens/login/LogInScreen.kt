@@ -50,7 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -77,8 +76,6 @@ fun LogInScreen(
     viewmodel: LogInScreenViewModel = koinViewModel<LogInScreenViewModel>()
 ) {
 
-    val context = LocalContext.current
-
     val email by viewmodel.email.collectAsStateWithLifecycle()
     val password by viewmodel.password.collectAsStateWithLifecycle()
     val isPasswordVisible by viewmodel.isPasswordVisible.collectAsStateWithLifecycle()
@@ -94,15 +91,13 @@ fun LogInScreen(
     val focusRequesterPassword = remember { FocusRequester() }
 
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { result ->
+        contract = ActivityResultContracts.StartIntentSenderForResult(), onResult = { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 viewmodel.signInWithIntent(
                     intent = result.data ?: return@rememberLauncherForActivityResult
                 )
             }
-        }
-    )
+        })
 
     LaunchedEffect(key1 = signInState.isSignInSuccessful) {
         if (signInState.isSignInSuccessful) {
@@ -116,47 +111,40 @@ fun LogInScreen(
     }
 
     if (showSignInErrorDialog) {
-        AlertDialog(
-            icon = {
-                Icon(
-                    Icons.Default.Error,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            },
-            title = {
+        AlertDialog(icon = {
+            Icon(
+                Icons.Default.Error,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.error
+            )
+        }, title = {
+            Text(
+                text = "Error",
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }, text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Text(
-                    text = "Error",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    text = signInState.signInError!!, color = MaterialTheme.colorScheme.onSurface
                 )
-            },
-            text = {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = signInState.signInError!!,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewmodel.resetState()
-                    showSignInErrorDialog = false // Hide dialog after click on button
-                }) {
-                    Text(text = "Retry?", fontWeight = FontWeight.Bold)
-                }
-            },
-            onDismissRequest = {
-                viewmodel.resetState()
-                showSignInErrorDialog = false // Hide dialog when dismissed
             }
-        )
+        }, confirmButton = {
+            TextButton(onClick = {
+                viewmodel.resetState()
+                showSignInErrorDialog = false // Hide dialog after click on button
+            }) {
+                Text(text = "Retry?", fontWeight = FontWeight.Bold)
+            }
+        }, onDismissRequest = {
+            viewmodel.resetState()
+            showSignInErrorDialog = false // Hide dialog when dismissed
+        })
     }
 
 
@@ -342,20 +330,16 @@ fun LogInScreen(
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
-            }
-        )
+            })
 
         Spacer(modifier = modifier.height(24.dp))
 
         // Login Button
         Button(
-            enabled = email.isNotBlank() && password.isNotBlank(),
-            onClick = {
+            enabled = email.isNotBlank() && password.isNotBlank(), onClick = {
                 viewmodel.logIn(email, password)
                 viewmodel.switchSignInMode()
-            },
-            modifier = modifier.fillMaxWidth(0.8f),
-            shape = MaterialTheme.shapes.extraLarge
+            }, modifier = modifier.fillMaxWidth(0.8f), shape = MaterialTheme.shapes.extraLarge
         ) {
             Icon(
                 Icons.AutoMirrored.Filled.Login,
@@ -385,9 +369,7 @@ fun LogInScreen(
                         // Handle the case where intentSender is null (e.g., display an error message)
                     }
                 }
-            },
-            modifier = modifier.fillMaxWidth(0.8f),
-            shape = MaterialTheme.shapes.extraLarge
+            }, modifier = modifier.fillMaxWidth(0.8f), shape = MaterialTheme.shapes.extraLarge
         ) {
             Image(
                 painter = painterResource(id = R.drawable.google_logo),
@@ -408,13 +390,12 @@ fun LogInScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Don't have an account?",
-                textAlign = TextAlign.Center
+                text = "Don't have an account?", textAlign = TextAlign.Center
             )
             TextButton(
                 onClick = {
                     navigate(Dest.SignUPScreen)
-            }) {
+                }) {
                 Icon(
                     Icons.Default.HowToReg,
                     contentDescription = null,

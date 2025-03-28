@@ -13,7 +13,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.tasks.await
 import uk.ac.tees.mad.carcare.R
 import uk.ac.tees.mad.carcare.model.dataclass.firebase.SignInResult
-import uk.ac.tees.mad.carcare.model.dataclass.firebase.UserData
 import uk.ac.tees.mad.carcare.model.dataclass.firebase.UserDataGoogle
 
 class GoogleAuthUiClient(
@@ -33,16 +32,11 @@ class GoogleAuthUiClient(
     }
 
     suspend fun signIn(): IntentSender? {
-        val request = BeginSignInRequest.builder()
-            .setGoogleIdTokenRequestOptions(
-                GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
+        val request = BeginSignInRequest.builder().setGoogleIdTokenRequestOptions(
+                GoogleIdTokenRequestOptions.builder().setSupported(true)
                     .setServerClientId(context.getString(R.string.web_client_id))
-                    .setFilterByAuthorizedAccounts(false)
-                    .build()
-            )
-            .setAutoSelectEnabled(true)
-            .build()
+                    .setFilterByAuthorizedAccounts(false).build()
+            ).setAutoSelectEnabled(true).build()
         return try {
             Log.d(TAG, "signIn: ok")
             oneTapClient.beginSignIn(request).await().pendingIntent.intentSender
@@ -57,7 +51,10 @@ class GoogleAuthUiClient(
             oneTapClient.getSignInCredentialFromIntent(intent)
         } catch (e: ApiException) {
             Log.e(TAG, "signInWithIntent: ", e)
-            return SignInResult(data = null, errorMessage = "Error getting credentials: ${e.message}")
+            return SignInResult(
+                data = null,
+                errorMessage = "Error getting credentials: ${e.message}"
+            )
         }
 
         return try {
@@ -82,9 +79,7 @@ class GoogleAuthUiClient(
     fun getSignedInUser(): UserDataGoogle? {
         return auth.currentUser?.run {
             UserDataGoogle(
-                userId = uid,
-                username = displayName,
-                profilePictureUrl = photoUrl.toString()
+                userId = uid, username = displayName, profilePictureUrl = photoUrl.toString()
             )
         }
     }

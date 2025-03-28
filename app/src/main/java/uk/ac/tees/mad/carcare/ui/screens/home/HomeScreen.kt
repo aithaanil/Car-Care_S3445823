@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.koin.androidx.compose.koinViewModel
 import uk.ac.tees.mad.carcare.ui.navigation.SubGraph
-import uk.ac.tees.mad.carcare.ui.screens.login.LogInScreenViewModel
 
 @Composable
 fun HomeScreen(

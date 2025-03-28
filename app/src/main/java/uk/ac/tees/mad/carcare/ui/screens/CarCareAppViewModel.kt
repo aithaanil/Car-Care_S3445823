@@ -8,13 +8,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 open class CarCareAppViewModel : ViewModel() {
-    fun launchCatching(block: suspend CoroutineScope.() -> Unit) =
-        viewModelScope.launch(
-            CoroutineExceptionHandler { _, throwable ->
-                Log.d(ERROR_TAG, throwable.message.orEmpty())
-            },
-            block = block
-        )
+    fun launchCatching(block: suspend CoroutineScope.() -> Unit) = viewModelScope.launch(
+        CoroutineExceptionHandler { _, throwable ->
+            Log.d(ERROR_TAG, throwable.message.orEmpty())
+        }, block = block
+    )
 
     companion object {
         const val ERROR_TAG = "CARCARE APP ERROR"

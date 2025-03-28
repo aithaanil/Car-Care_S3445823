@@ -5,7 +5,7 @@ import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 
 class HomeScreenViewModel(
     private val authRepository: AuthRepository
-): CarCareAppViewModel() {
+) : CarCareAppViewModel() {
     fun logOut() {
         authRepository.signOut()
     }

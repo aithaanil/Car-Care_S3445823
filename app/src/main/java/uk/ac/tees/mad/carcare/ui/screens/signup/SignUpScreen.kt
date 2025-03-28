@@ -58,8 +58,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import uk.ac.tees.mad.carcare.R
 import uk.ac.tees.mad.carcare.model.dataclass.firebase.AuthResult
-import uk.ac.tees.mad.carcare.ui.navigation.Dest
-import uk.ac.tees.mad.carcare.ui.screens.login.LogInScreenViewModel
 
 @Composable
 fun SignUpScreen(
@@ -325,20 +323,16 @@ fun SignUpScreen(
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
-            }
-        )
+            })
 
         Spacer(modifier = modifier.height(24.dp))
 
         // SignUp Button
         Button(
-            enabled = name.isNotBlank() && email.isNotBlank() && password.isNotBlank(),
-            onClick = {
+            enabled = name.isNotBlank() && email.isNotBlank() && password.isNotBlank(), onClick = {
                 viewmodel.signUp(email, password)
                 viewmodel.switchSignUpMode()
-            },
-            modifier = modifier.fillMaxWidth(0.8f),
-            shape = MaterialTheme.shapes.extraLarge
+            }, modifier = modifier.fillMaxWidth(0.8f), shape = MaterialTheme.shapes.extraLarge
         ) {
             Icon(
                 Icons.Default.HowToReg,
@@ -359,8 +353,7 @@ fun SignUpScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Already have an account?",
-                textAlign = TextAlign.Center
+                text = "Already have an account?", textAlign = TextAlign.Center
             )
             TextButton(
                 onClick = {
