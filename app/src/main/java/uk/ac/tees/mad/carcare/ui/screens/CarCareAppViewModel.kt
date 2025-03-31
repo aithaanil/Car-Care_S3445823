@@ -6,8 +6,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import uk.ac.tees.mad.carcare.model.repository.AuthRepository
 
-open class CarCareAppViewModel : ViewModel() {
+open class CarCareAppViewModel(
+    private val authRepository: AuthRepository
+) : ViewModel() {
     fun launchCatching(block: suspend CoroutineScope.() -> Unit) = viewModelScope.launch(
         CoroutineExceptionHandler { _, throwable ->
             Log.d(ERROR_TAG, throwable.message.orEmpty())
@@ -16,5 +19,9 @@ open class CarCareAppViewModel : ViewModel() {
 
     companion object {
         const val ERROR_TAG = "CARCARE APP ERROR"
+    }
+
+    fun logOut() {
+        authRepository.signOut()
     }
 }

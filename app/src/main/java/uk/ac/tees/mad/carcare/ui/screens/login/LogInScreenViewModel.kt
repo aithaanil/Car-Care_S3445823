@@ -3,6 +3,7 @@ package uk.ac.tees.mad.carcare.ui.screens.login
 import android.content.Intent
 import android.content.IntentSender
 import android.util.Log
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,7 @@ import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 
 class LogInScreenViewModel(
     private val authRepository: AuthRepository, private val googleAuthUiClient: GoogleAuthUiClient
-) : CarCareAppViewModel() {
+) : ViewModel() {
     private val _logInResult = MutableStateFlow<AuthResult<Boolean>>(AuthResult.Success(false))
     val logInResult: StateFlow<AuthResult<Boolean>> = _logInResult.asStateFlow()
 

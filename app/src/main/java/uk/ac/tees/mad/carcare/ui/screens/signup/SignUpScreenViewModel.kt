@@ -1,5 +1,6 @@
 package uk.ac.tees.mad.carcare.ui.screens.signup
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,7 @@ import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 
 class SignUpScreenViewModel(
     private val authRepository: AuthRepository
-) : CarCareAppViewModel() {
+) : ViewModel() {
 
     private val _signUpResult = MutableStateFlow<AuthResult<Boolean>>(AuthResult.Success(false))
     val signUpResult: StateFlow<AuthResult<Boolean>> = _signUpResult.asStateFlow()

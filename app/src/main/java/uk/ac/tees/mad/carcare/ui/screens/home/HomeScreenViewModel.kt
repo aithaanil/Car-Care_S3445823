@@ -1,5 +1,6 @@
 package uk.ac.tees.mad.carcare.ui.screens.home
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,7 @@ import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 
 class HomeScreenViewModel(
     private val authRepository: AuthRepository
-) : CarCareAppViewModel() {
+) : ViewModel() {
 
     private val _userDetails = MutableStateFlow<AuthResult<UserDetails>>(AuthResult.Loading)
     val userDetails: StateFlow<AuthResult<UserDetails>> = _userDetails.asStateFlow()
@@ -39,9 +40,5 @@ class HomeScreenViewModel(
                 }
             }
         }
-    }
-
-    fun logOut() {
-        authRepository.signOut()
     }
 }

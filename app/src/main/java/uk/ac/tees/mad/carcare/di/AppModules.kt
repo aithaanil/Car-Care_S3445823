@@ -8,6 +8,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import uk.ac.tees.mad.carcare.model.repository.AuthRepository
 import uk.ac.tees.mad.carcare.model.utils.GoogleAuthUiClient
+import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 import uk.ac.tees.mad.carcare.ui.screens.home.HomeScreenViewModel
 import uk.ac.tees.mad.carcare.ui.screens.login.LogInScreenViewModel
 import uk.ac.tees.mad.carcare.ui.screens.signup.SignUpScreenViewModel
@@ -34,6 +35,7 @@ val appModule = module {
         )
     }
 
+    viewModelOf(::CarCareAppViewModel)
     viewModelOf(::HomeScreenViewModel)
 
 }
