@@ -27,7 +27,10 @@ fun NavGraphBuilder.CarCareGraph(appState: CarCareAppState) {
     }
     navigation<SubGraph.HomeGraph>(startDestination = Dest.HomeScreen) {
         composable<Dest.HomeScreen> {
-            HomeScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })
+            HomeScreen(
+                openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
+                navigate = { route -> appState.navigate(route) }
+            )
         }
         composable<Dest.BookingScreen> {
             //BookingScreen()

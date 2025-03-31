@@ -1,15 +1,18 @@
 package uk.ac.tees.mad.carcare.ui.screens.splash
 
+import uk.ac.tees.mad.carcare.model.repository.AuthRepository
 import uk.ac.tees.mad.carcare.ui.navigation.SubGraph
 import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 
 class SplashViewModel(
-
+    private val authRepository: AuthRepository
 ) : CarCareAppViewModel() {
 
     fun onAppStart(openAndPopUp: (Any, Any) -> Unit) {
-//        if (accountService.hasUser()) openAndPopUp(NOTES_LIST_SCREEN, SPLASH_SCREEN)
-//        else openAndPopUp(SIGN_IN_SCREEN, SPLASH_SCREEN)
-        openAndPopUp(SubGraph.AuthGraph, SubGraph.SplashScreenGraph)
+        if(authRepository.isSignedIn()){
+            openAndPopUp(SubGraph.HomeGraph, SubGraph.SplashScreenGraph)
+        } else {
+            openAndPopUp(SubGraph.AuthGraph, SubGraph.SplashScreenGraph)
+        }
     }
 }

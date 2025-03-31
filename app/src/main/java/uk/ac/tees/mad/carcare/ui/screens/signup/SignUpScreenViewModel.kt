@@ -17,9 +17,6 @@ class SignUpScreenViewModel(
     private val _signUpResult = MutableStateFlow<AuthResult<Boolean>>(AuthResult.Success(false))
     val signUpResult: StateFlow<AuthResult<Boolean>> = _signUpResult.asStateFlow()
 
-    private val _name = MutableStateFlow("")
-    val name = _name.asStateFlow()
-
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
 
@@ -31,10 +28,6 @@ class SignUpScreenViewModel(
 
     private val _isSignUpMode = MutableStateFlow(true)
     val isSignUpMode = _isSignUpMode.asStateFlow()
-
-    fun updateName(newName: String) {
-        _name.value = newName
-    }
 
     fun updateEmail(newEmail: String) {
         _email.value = newEmail
@@ -55,9 +48,6 @@ class SignUpScreenViewModel(
     fun signUp(email: String, pass: String) {
         authRepository.signUp(email, pass).onEach { result ->
             _signUpResult.value = result
-            if (result is AuthResult.Success) {
-                authRepository.updateDisplayName(_name.value)
-            }
         }.launchIn(viewModelScope)
     }
 }

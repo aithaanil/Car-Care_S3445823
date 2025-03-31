@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -65,7 +66,6 @@ fun SignUpScreen(
     popUp: () -> Unit,
     viewmodel: SignUpScreenViewModel = koinViewModel<SignUpScreenViewModel>()
 ) {
-    val name by viewmodel.name.collectAsStateWithLifecycle()
     val email by viewmodel.email.collectAsStateWithLifecycle()
     val password by viewmodel.password.collectAsStateWithLifecycle()
     val isPasswordVisible by viewmodel.isPasswordVisible.collectAsStateWithLifecycle()
@@ -73,14 +73,12 @@ fun SignUpScreen(
     val signUpResult by viewmodel.signUpResult.collectAsStateWithLifecycle()
 
     val focusManager = LocalFocusManager.current
-    val focusRequesterName = remember { FocusRequester() }
     val focusRequesterEmail = remember { FocusRequester() }
     val focusRequesterPassword = remember { FocusRequester() }
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
@@ -217,39 +215,6 @@ fun SignUpScreen(
 
         Spacer(modifier = modifier.height(24.dp))
 
-        // UserName TextField
-        OutlinedTextField(
-            value = name,
-            modifier = modifier
-                .fillMaxWidth(0.9f)
-                .focusRequester(focusRequesterName),
-            onValueChange = {
-                viewmodel.updateName(it)
-            },
-            label = {
-                Text(
-                    text = "Name"
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    Icons.Filled.AccountCircle,
-                    contentDescription = "Name",
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                focusRequesterEmail.requestFocus()
-            }),
-            shape = MaterialTheme.shapes.extraLarge,
-            singleLine = true
-        )
-
-        Spacer(modifier = modifier.height(16.dp))
-
         // Email TextField
         OutlinedTextField(
             value = email,
@@ -329,7 +294,7 @@ fun SignUpScreen(
 
         // SignUp Button
         Button(
-            enabled = name.isNotBlank() && email.isNotBlank() && password.isNotBlank(), onClick = {
+            enabled = email.isNotBlank() && password.isNotBlank(), onClick = {
                 viewmodel.signUp(email, password)
                 viewmodel.switchSignUpMode()
             }, modifier = modifier.fillMaxWidth(0.8f), shape = MaterialTheme.shapes.extraLarge
