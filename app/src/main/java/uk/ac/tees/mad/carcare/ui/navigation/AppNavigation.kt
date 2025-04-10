@@ -6,6 +6,7 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import uk.ac.tees.mad.carcare.ui.screens.booking.BookingScreen
 import uk.ac.tees.mad.carcare.ui.screens.confirmpage.AppointmentConfirmationScreen
+import uk.ac.tees.mad.carcare.ui.screens.history.AppointmentHistoryScreen
 import uk.ac.tees.mad.carcare.ui.screens.home.HomeScreen
 import uk.ac.tees.mad.carcare.ui.screens.login.LogInScreen
 import uk.ac.tees.mad.carcare.ui.screens.signup.SignUpScreen
@@ -50,7 +51,9 @@ fun NavGraphBuilder.CarCareGraph(appState: CarCareAppState) {
             )
         }
         composable<Dest.AppointmentHistoryScreen> {
-            //AppointmentHistoryScreen()
+            AppointmentHistoryScreen(
+                popUp = { appState.popUp() },
+            )
         }
         composable<Dest.ProfileAndSettingsScreen> {
             //ProfileAndSettingsScreen()

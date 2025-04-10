@@ -103,6 +103,7 @@ fun LogInScreen(
     LaunchedEffect(key1 = signInState.isSignInSuccessful) {
         if (signInState.isSignInSuccessful) {
             openAndPopUp(SubGraph.HomeGraph, SubGraph.AuthGraph)
+            viewmodel.startSync()
             viewmodel.resetState()
         }
         if (signInState.signInError != null) {
@@ -180,6 +181,7 @@ fun LogInScreen(
 
             is AuthResult.Success -> {
                 // Handle successful log in
+                viewmodel.startSync()
                 openAndPopUp(SubGraph.HomeGraph, SubGraph.AuthGraph)
 
             }
