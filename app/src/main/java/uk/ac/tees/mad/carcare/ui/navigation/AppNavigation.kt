@@ -9,6 +9,7 @@ import uk.ac.tees.mad.carcare.ui.screens.confirmpage.AppointmentConfirmationScre
 import uk.ac.tees.mad.carcare.ui.screens.history.AppointmentHistoryScreen
 import uk.ac.tees.mad.carcare.ui.screens.home.HomeScreen
 import uk.ac.tees.mad.carcare.ui.screens.login.LogInScreen
+import uk.ac.tees.mad.carcare.ui.screens.profileandsettings.ProfileAndSettingsScreen
 import uk.ac.tees.mad.carcare.ui.screens.signup.SignUpScreen
 import uk.ac.tees.mad.carcare.ui.screens.splash.SplashScreen
 
@@ -33,21 +34,18 @@ fun NavGraphBuilder.CarCareGraph(appState: CarCareAppState) {
         composable<Dest.HomeScreen> {
             HomeScreen(
                 openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
-                navigate = { route -> appState.navigate(route) }
-            )
+                navigate = { route -> appState.navigate(route) })
         }
         composable<Dest.BookingScreen> {
             BookingScreen(
                 navigate = { route -> appState.navigate(route) },
                 openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
-                popUp = { appState.popUp() }
-            )
+                popUp = { appState.popUp() })
         }
         composable<Dest.AppointmentConfirmationScreen> {
-            val args= it.toRoute<Dest.AppointmentConfirmationScreen>()
+            val args = it.toRoute<Dest.AppointmentConfirmationScreen>()
             AppointmentConfirmationScreen(
-                popUp = { appState.popUp() },
-                appointmentId = args.appointmentId
+                popUp = { appState.popUp() }, appointmentId = args.appointmentId
             )
         }
         composable<Dest.AppointmentHistoryScreen> {
@@ -56,7 +54,14 @@ fun NavGraphBuilder.CarCareGraph(appState: CarCareAppState) {
             )
         }
         composable<Dest.ProfileAndSettingsScreen> {
-            //ProfileAndSettingsScreen()
+            ProfileAndSettingsScreen(
+                openAndPopUp = { route, popUp ->
+                    appState.navigateAndPopUp(
+                        route,
+                        popUp
+                    )
+                },
+                popUp = { appState.popUp() })
         }
     }
 

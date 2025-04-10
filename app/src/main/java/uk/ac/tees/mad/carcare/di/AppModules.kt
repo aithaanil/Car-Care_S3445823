@@ -21,6 +21,7 @@ import uk.ac.tees.mad.carcare.ui.screens.confirmpage.AppointmentConfirmationScre
 import uk.ac.tees.mad.carcare.ui.screens.history.AppointmentHistoryScreenViewModel
 import uk.ac.tees.mad.carcare.ui.screens.home.HomeScreenViewModel
 import uk.ac.tees.mad.carcare.ui.screens.login.LogInScreenViewModel
+import uk.ac.tees.mad.carcare.ui.screens.profileandsettings.ProfileAndSettingsScreenViewModel
 import uk.ac.tees.mad.carcare.ui.screens.signup.SignUpScreenViewModel
 import uk.ac.tees.mad.carcare.ui.screens.splash.SplashViewModel
 
@@ -67,6 +68,7 @@ val appModule = module {
     viewModelOf(::BookingScreenViewModel)
     viewModelOf(::AppointmentConfirmationScreenViewModel)
     viewModelOf(::AppointmentHistoryScreenViewModel)
+    viewModelOf(::ProfileAndSettingsScreenViewModel)
 
 }
 

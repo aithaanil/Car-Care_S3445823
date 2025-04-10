@@ -25,31 +25,33 @@ class AppointmentSynchronizer(
                     appointments.forEach { appointment ->
                         if (appointment.needsUpdate) {
                             if (!appointment.isDeleted) {
-                                carCareFirestoreRepository.updateAppointment(userId,appointment).collectLatest {firestoreResult ->
+                                carCareFirestoreRepository.updateAppointment(userId, appointment)
+                                    .collectLatest { firestoreResult ->
+                                        if (firestoreResult is FirestoreResult.Success) {
+                                            Log.d(
+                                                "AppointmentSync",
+                                                "Successfully updated appointment in Firestore"
+                                            )
+                                            // Clear needsUpdate
+                                            carCareAppointmentRepository.updateAppointmentFromFirestore(
+                                                appointment.copy(
+                                                    needsUpdate = false
+                                                )
+                                            )
+                                        }
+                                    }
+                            }
+                        } else if (appointment.isDeleted) {
+                            carCareFirestoreRepository.deleteAppointment(userId, appointment)
+                                .collectLatest { firestoreResult ->
                                     if (firestoreResult is FirestoreResult.Success) {
                                         Log.d(
                                             "AppointmentSync",
-                                            "Successfully updated appointment in Firestore"
+                                            "Successfully deleted appointment from Firestore"
                                         )
-                                        // Clear needsUpdate
-                                        carCareAppointmentRepository.updateAppointmentFromFirestore(
-                                            appointment.copy(
-                                                needsUpdate = false
-                                            )
-                                        )
+                                        carCareAppointmentRepository.deleteAppointment(appointment)
                                     }
                                 }
-                            }
-                        } else if (appointment.isDeleted) {
-                            carCareFirestoreRepository.deleteAppointment(userId,appointment).collectLatest { firestoreResult ->
-                                if (firestoreResult is FirestoreResult.Success) {
-                                    Log.d(
-                                        "AppointmentSync",
-                                        "Successfully deleted appointment from Firestore"
-                                    )
-                                    carCareAppointmentRepository.deleteAppointment(appointment)
-                                }
-                            }
                         }
                     }
                 }
@@ -59,8 +61,10 @@ class AppointmentSynchronizer(
     }
 
     private suspend fun syncFromFirestoreToLocal(userId: String) {
-        val localAppointments = carCareAppointmentRepository.getAllAppointmentDataForUser(userId).firstOrNull() ?: emptyList()
-        carCareFirestoreRepository.getAppointmentForUser(userId).collectLatest {firestoreResult ->
+        val localAppointments =
+            carCareAppointmentRepository.getAllAppointmentDataForUser(userId).firstOrNull()
+                ?: emptyList()
+        carCareFirestoreRepository.getAppointmentForUser(userId).collectLatest { firestoreResult ->
             when (firestoreResult) {
                 is FirestoreResult.Error -> {
                     Log.e(
@@ -69,17 +73,22 @@ class AppointmentSynchronizer(
                         firestoreResult.exception
                     )
                 }
+
                 is FirestoreResult.Success -> {
                     val remoteAppointments = firestoreResult.data
                     remoteAppointments.forEach { remoteAppointment ->
-                        val localAppointment = localAppointments.find { it.firestoreId == remoteAppointment.firestoreId }
+                        val localAppointment =
+                            localAppointments.find { it.firestoreId == remoteAppointment.firestoreId }
                         if (localAppointment == null) {
                             carCareAppointmentRepository.insertAppointment(remoteAppointment)
                         } else if (remoteAppointment != localAppointment) {
-                            carCareAppointmentRepository.updateAppointmentFromFirestore(remoteAppointment)
+                            carCareAppointmentRepository.updateAppointmentFromFirestore(
+                                remoteAppointment
+                            )
                         }
                     }
                 }
+
                 else -> {}
             }
 

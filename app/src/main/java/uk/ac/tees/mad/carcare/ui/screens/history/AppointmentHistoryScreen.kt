@@ -77,8 +77,7 @@ fun AppointmentHistoryScreen(
 
 @Composable
 fun AppointmentHistoryItem(
-    appointment: CarCareAppointment,
-    viewModel: AppointmentHistoryScreenViewModel
+    appointment: CarCareAppointment, viewModel: AppointmentHistoryScreenViewModel
 ) {
     val cal = Calendar.getInstance()
     val formatter = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())

@@ -14,12 +14,16 @@ class CarCareFirestoreRepository(
     private fun getCarCareAppointmentCollection(userId: String) =
         firestore.collection("users").document(userId).collection("appointments")
 
-    fun addAppointment(userId: String, appointment: CarCareAppointment): Flow<FirestoreResult<String>> = flow {
+    fun addAppointment(
+        userId: String,
+        appointment: CarCareAppointment
+    ): Flow<FirestoreResult<String>> = flow {
         emit(FirestoreResult.Loading)
         try {
             val appointmentMap = appointment.toMapForFirestore()
 
-            val documentReference = getCarCareAppointmentCollection(userId).add(appointmentMap).await()
+            val documentReference =
+                getCarCareAppointmentCollection(userId).add(appointmentMap).await()
 
             val firestoreId = documentReference.id
             emit(FirestoreResult.Success(firestoreId))
@@ -28,24 +32,32 @@ class CarCareFirestoreRepository(
         }
     }
 
-    fun getAppointmentForUser(userId: String): Flow<FirestoreResult<List<CarCareAppointment>>> = flow {
-        emit(FirestoreResult.Loading)
-        try {
-            val querySnapshot = getCarCareAppointmentCollection(userId).orderBy("appointmentDate", Query.Direction.DESCENDING).get().await()
-            val appointmentEntries = querySnapshot.documents.mapNotNull { document ->
-                val appointment = document.toObject(CarCareAppointment::class.java)
-                appointment?.copy(firestoreId = document.id)
+    fun getAppointmentForUser(userId: String): Flow<FirestoreResult<List<CarCareAppointment>>> =
+        flow {
+            emit(FirestoreResult.Loading)
+            try {
+                val querySnapshot = getCarCareAppointmentCollection(userId).orderBy(
+                    "appointmentDate",
+                    Query.Direction.DESCENDING
+                ).get().await()
+                val appointmentEntries = querySnapshot.documents.mapNotNull { document ->
+                    val appointment = document.toObject(CarCareAppointment::class.java)
+                    appointment?.copy(firestoreId = document.id)
+                }
+                emit(FirestoreResult.Success(appointmentEntries))
+            } catch (e: Exception) {
+                emit(FirestoreResult.Error(e))
             }
-            emit(FirestoreResult.Success(appointmentEntries))
-        } catch (e: Exception) {
-            emit(FirestoreResult.Error(e))
         }
-    }
 
-    fun getAppointmentDetails(userId: String, firestoreId: String): Flow<FirestoreResult<CarCareAppointment>> = flow {
+    fun getAppointmentDetails(
+        userId: String,
+        firestoreId: String
+    ): Flow<FirestoreResult<CarCareAppointment>> = flow {
         emit(FirestoreResult.Loading)
         try {
-            val documentSnapshot = getCarCareAppointmentCollection(userId).document(firestoreId).get().await()
+            val documentSnapshot =
+                getCarCareAppointmentCollection(userId).document(firestoreId).get().await()
             if (documentSnapshot.exists()) {
                 val appointment = documentSnapshot.toObject(CarCareAppointment::class.java)
                 appointment?.let {
@@ -59,7 +71,10 @@ class CarCareFirestoreRepository(
         }
     }
 
-    fun updateAppointment(userId: String, appointment: CarCareAppointment): Flow<FirestoreResult<Boolean>> = flow {
+    fun updateAppointment(
+        userId: String,
+        appointment: CarCareAppointment
+    ): Flow<FirestoreResult<Boolean>> = flow {
         emit(FirestoreResult.Loading)
         try {
             // Find the correct Firestore document ID
@@ -76,7 +91,10 @@ class CarCareFirestoreRepository(
         }
     }
 
-    fun deleteAppointment(userId: String, appointment: CarCareAppointment): Flow<FirestoreResult<Boolean>> = flow {
+    fun deleteAppointment(
+        userId: String,
+        appointment: CarCareAppointment
+    ): Flow<FirestoreResult<Boolean>> = flow {
         emit(FirestoreResult.Loading)
         try {
             // Find the correct Firestore document ID

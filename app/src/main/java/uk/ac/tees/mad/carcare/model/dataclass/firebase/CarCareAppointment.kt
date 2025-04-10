@@ -5,8 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "carcare_appointment_data")
 data class CarCareAppointment(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     var firestoreId: String = "",
     val userId: String = "",
     val service: String = "",

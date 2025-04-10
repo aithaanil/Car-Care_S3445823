@@ -3,8 +3,6 @@ package uk.ac.tees.mad.carcare.ui.screens.booking
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +23,8 @@ class BookingScreenViewModel(
     private val carCareFirestoreRepository: CarCareFirestoreRepository,
     private val careAppointmentRepository: CarCareAppointmentRepository
 ) : ViewModel() {
-    val serviceOptions: List<String> = listOf("Oil Change", "Tire Rotation", "Brake Inspection", "Full Service")
+    val serviceOptions: List<String> =
+        listOf("Oil Change", "Tire Rotation", "Brake Inspection", "Full Service")
     val centerOptions: List<String> = listOf("Center A", "Center B", "Center C", "Center D")
 
     private val _selectedService = MutableStateFlow(serviceOptions[0])
@@ -89,36 +88,40 @@ class BookingScreenViewModel(
         }
     }
 
-    fun bookService(){
+    fun bookService() {
         updateCarCareAppointment()
         viewModelScope.launch {
-        carCareFirestoreRepository.addAppointment(userData.value.userId!!,_appointment.value!!).collectLatest {firestoreResult->
-            when (firestoreResult) {
-                is FirestoreResult.Error -> {
-                    _bookingState.value = FirestoreResult.Error(firestoreResult.exception)
-                    Log.e(
-                        "CarCareAppointmentFirestore",
-                        "Error adding Appointment to Firestore"
-                    )
+            carCareFirestoreRepository.addAppointment(userData.value.userId!!, _appointment.value!!)
+                .collectLatest { firestoreResult ->
+                    when (firestoreResult) {
+                        is FirestoreResult.Error -> {
+                            _bookingState.value = FirestoreResult.Error(firestoreResult.exception)
+                            Log.e(
+                                "CarCareAppointmentFirestore",
+                                "Error adding Appointment to Firestore"
+                            )
+                        }
+
+                        is FirestoreResult.Loading -> {
+                            _bookingState.value = FirestoreResult.Loading
+                        }
+
+                        is FirestoreResult.Success -> {
+                            updateCarCareAppointment(firestoreResult.data.toString())
+                            careAppointmentRepository.insertAppointment(_appointment.value!!)
+                            _onSuccessAppointmentId.value = firestoreResult.data
+                            _bookingState.value = FirestoreResult.Success(firestoreResult.data)
+                            Log.d(
+                                "CarCareAppointmentFirestore",
+                                "Successfully added Appointment, firestoreId: ${firestoreResult.data}"
+                            )
+                        }
+                    }
                 }
-                is FirestoreResult.Loading -> {
-                    _bookingState.value = FirestoreResult.Loading
-                }
-                is FirestoreResult.Success -> {
-                    updateCarCareAppointment(firestoreResult.data.toString())
-                    careAppointmentRepository.insertAppointment(_appointment.value!!)
-                    _onSuccessAppointmentId.value = firestoreResult.data
-                    _bookingState.value = FirestoreResult.Success(firestoreResult.data)
-                    Log.d(
-                        "CarCareAppointmentFirestore",
-                        "Successfully added Appointment, firestoreId: ${firestoreResult.data}"
-                    )
-                }
-            }
-        }}
+        }
     }
 
-    fun updateCarCareAppointment(firsStoreId: String = ""){
+    fun updateCarCareAppointment(firsStoreId: String = "") {
         _appointment.update {
             CarCareAppointment(
                 userId = _userData.value.userId!!,
@@ -168,7 +171,7 @@ class BookingScreenViewModel(
         _image.value = image
     }
 
-    fun toggleShowBookingDialog(){
+    fun toggleShowBookingDialog() {
         _showBookingDialog.value = !_showBookingDialog.value
     }
 }

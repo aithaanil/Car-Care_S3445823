@@ -17,7 +17,6 @@ import uk.ac.tees.mad.carcare.model.dataclass.firebase.SignInState
 import uk.ac.tees.mad.carcare.model.repository.AuthRepository
 import uk.ac.tees.mad.carcare.model.utils.AppointmentSynchronizer
 import uk.ac.tees.mad.carcare.model.utils.GoogleAuthUiClient
-import uk.ac.tees.mad.carcare.ui.screens.CarCareAppViewModel
 
 class LogInScreenViewModel(
     private val authRepository: AuthRepository,
