@@ -123,15 +123,19 @@ fun BookingScreen(
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
+    val context = LocalContext.current
     val imagePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(), onResult = { uri ->
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
             hasImage = uri != null
             imageUri = uri
+            uri?.let { viewmodel.updateImage(it, context.contentResolver) }
         })
-    val context = LocalContext.current
     val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(), onResult = { success ->
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
             hasImage = success
+            imageUri?.let { viewmodel.updateImage(it, context.contentResolver) }
         })
 
     val showBookingDialog by viewmodel.showBookingDialog.collectAsStateWithLifecycle()
@@ -429,7 +433,6 @@ fun BookingScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         if (hasImage && imageUri != null) {
-                            viewmodel.updateImage(imageUri.toString())
                             AsyncImage(
                                 model = imageUri,
                                 modifier = Modifier.fillMaxSize(),
