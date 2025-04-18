@@ -19,4 +19,8 @@ class SplashViewModel(
             openAndPopUp(SubGraph.AuthGraph, SubGraph.SplashScreenGraph)
         }
     }
+
+    fun openAuthGraph(openAndPopUp: (Any, Any) -> Unit) {
+        openAndPopUp(SubGraph.AuthGraph, SubGraph.SplashScreenGraph)
+    }
 }

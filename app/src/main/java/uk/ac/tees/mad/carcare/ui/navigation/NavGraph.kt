@@ -38,6 +38,9 @@ sealed class Dest {
 
     @Serializable
     data object ProfileAndSettingsScreen : Dest()
+
+    @Serializable
+    data class LoadingErrorScreen(val errorMessage: String) : Dest()
 }
 
 data class DrawerScreen(val name: String, val icon: ImageVector)

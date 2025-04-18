@@ -12,11 +12,19 @@ import uk.ac.tees.mad.carcare.ui.screens.login.LogInScreen
 import uk.ac.tees.mad.carcare.ui.screens.profileandsettings.ProfileAndSettingsScreen
 import uk.ac.tees.mad.carcare.ui.screens.signup.SignUpScreen
 import uk.ac.tees.mad.carcare.ui.screens.splash.SplashScreen
+import uk.ac.tees.mad.carcare.ui.util.LoadingErrorScreen
 
 fun NavGraphBuilder.CarCareGraph(appState: CarCareAppState) {
     navigation<SubGraph.SplashScreenGraph>(startDestination = Dest.SplashScreen) {
         composable<Dest.SplashScreen> {
-            SplashScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })
+            SplashScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
+                navigate = { route -> appState.navigate(route) })
+        }
+        composable<Dest.LoadingErrorScreen> {
+            val args = it.toRoute<Dest.LoadingErrorScreen>()
+            LoadingErrorScreen(
+                errorMessage = args.errorMessage,
+                onRetry = { appState.clearAndNavigate(SubGraph.SplashScreenGraph) })
         }
     }
     navigation<SubGraph.AuthGraph>(startDestination = Dest.LogInScreen) {
