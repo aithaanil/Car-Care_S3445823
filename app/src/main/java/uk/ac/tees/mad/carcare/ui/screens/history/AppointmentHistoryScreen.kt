@@ -62,7 +62,7 @@ fun AppointmentHistoryScreen(
             modifier = innerModifier,
             //verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(items = appointmentHistory, key = { it.firestoreId }) { appointment ->
+            items(items = appointmentHistory, key = { it.id }) { appointment ->
                 AppointmentHistoryItem(appointment = appointment, viewModel = viewModel)
             }
             item {
