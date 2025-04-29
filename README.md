@@ -1,6 +1,6 @@
 # Car Care App
 
-A Flutter application for managing car maintenance and care. Built with Firebase for backend services.
+Application for managing car maintenance and care. Built with Firebase for backend services.
 
 ## 🚗 Features
 
@@ -12,7 +12,7 @@ A Flutter application for managing car maintenance and care. Built with Firebase
 
 ## 🛠️ Tech Stack
 
-- **Flutter**: UI framework for building the app
+- **Kotlin**: UI framework for building the app
 - **Firebase**: Backend services including Authentication and Firestore
 
 
